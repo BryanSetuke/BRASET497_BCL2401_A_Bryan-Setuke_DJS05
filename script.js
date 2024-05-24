@@ -20,3 +20,8 @@ console.log('Scenario 2: Incrementing the Counter');
 store.dispatch({ type: actionTypes.INCREMENT });
 store.dispatch({ type: actionTypes.INCREMENT });
 console.log(store.getState()); // Expected output: { count: 2 }
+
+// Scenario 3: Decrementing the Counter
+console.log('Scenario 3: Decrementing the Counter');
+store.dispatch({ type: actionTypes.DECREMENT });
+console.log(store.getState()); // Expected output: { count: 1 }
