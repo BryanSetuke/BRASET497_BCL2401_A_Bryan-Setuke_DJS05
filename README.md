@@ -1,69 +1,160 @@
-# DJS05 Project Brief: Building a Redux-Inspired Store for a Tally App
+```markdown
+# Redux-Inspired Tally App Store
 
-In this challenge, you will venture into the realm of state management by constructing a Redux-inspired store to manage the state of a simple Tally App. Your primary goal is to manage the app's state changes efficiently, focusing on core functionalities like incrementing, decrementing, and resetting a counter. Instead of rendering changes on the UI, you'll subscribe to state updates and log them to the console, highlighting the power of state management in applications.
+## Overview
+This project implements a minimalistic, Redux-inspired store to manage and log the state of a counting Tally App. The store supports actions to increment, decrement, and reset the counter, and logs state changes to the console.
 
-## Objective
-Create a minimalistic, Redux-inspired store to manage and log the state of a counting Tally App. Your implementation will not involve UI rendering; instead, it will use console logs to demonstrate state management effectively.
+## How to Run the Code
+1. Ensure you have a modern web browser installed.
+2. Open `index.html` in your browser.
+3. Open the browser console to observe the state changes.
 
-Observer Pattern resource from Refactoring Guru: https://refactoring.guru/design-patterns/observer
+## Approach
+The approach for this project was to create a Redux-inspired state management system from scratch. The key components include:
+- **Store Implementation**: The store is created using the `createStore` function, which manages the state, dispatches actions, and allows subscriptions to state changes.
+- **State Management**: The state is managed by a reducer function that handles `INCREMENT`, `DECREMENT`, and `RESET` actions.
+- **Functional Programming**: The code adheres to functional programming principles, using pure functions and immutability to ensure predictable state management.
 
-## User Stories (Gherkin Syntax)
-Your challenge will encompass the following scenarios, tested through your store's implementation:
-
-### SCENARIO 1: Initial State Verification
-```
-GIVEN no interactions have been performed yet
-WHEN the “getState” method is run
-AND the result is logged to the console
-AND the browser console is open
-THEN the state should show a count of 0
-```
-
-### SCENARIO 2: Incrementing the Counter
-```
-GIVEN no interactions have been performed yet
-WHEN an “ADD” action is dispatched
-AND another “ADD” action is dispatched
-AND the browser console is open
-THEN the state should show a count of 2
+### Action Definitions (action.js)
+Defined action types for incrementing, decrementing, and resetting the counter.
+```javascript
+export const actionTypes = {
+    INCREMENT: "INCREMENT",
+    DECREMENT: "DECREMENT",
+    RESET: "RESET"
+};
 ```
 
-### SCENARIO 3: Decrementing the Counter
-```
-GIVEN the current count in the state is 2
-WHEN a “SUBTRACT” action is dispatched
-AND the browser console is open
-THEN the state should display a count of 1
-```
-
-### SCENARIO 4: Resetting the Counter
-```
-GIVEN the current count in the state is 1
-WHEN a “RESET” action is dispatched
-AND the browser console is open
-THEN the state should display a count of 0
+### Initial State (initialState.js)
+Defined the initial state of the application.
+```javascript
+export const initialState = {
+    count: 0,
+};
 ```
 
-## Requirements
-- **Implement a Global Store**: Create a Redux-inspired store that holds the state of the tally counter. The store should have the ability to dispatch actions and subscribe to state changes.
-- **State Management Functions**:
-  - **getState**: Returns the current state.
-  - **dispatch**: Takes an action (e.g., ADD, SUBTRACT, RESET) and updates the state accordingly.
-  - **subscribe**: Accepts a function that gets called whenever the state changes. This function should log the new state to the console.
-- **No UI Rendering**: This challenge focuses on state management without the complexity of UI rendering. All state changes should be observable through console logs.
-- **Functional Programming Principles**: Draw upon functional programming concepts as illustrated in the reference videos. While Redux is the inspiration, you're encouraged to apply these principles creatively in your implementation.
+### Reducer Function (reducer.js)
+Implemented the reducer function to update the state based on actions.
+```javascript
+import { actionTypes } from './action.js';
+import { initialState } from './initialState.js';
 
-## Submission Guidelines
-Your submission should consist of a JavaScript file(s) that encapsulate your Redux-inspired store and the logic for dispatching actions and subscribing to changes. Include a README.md file explaining:
-- How to run your code.
-- A brief overview of your approach.
-- Any challenges you faced and how you overcame them.
+export function reducer(state = initialState, action) {
+    switch (action.type) {
+        case actionTypes.INCREMENT:
+            return { count: state.count + 1 };
+        case actionTypes.DECREMENT:
+            return { count: state.count - 1 };
+        case actionTypes.RESET:
+            return { count: 0 };
+        default:
+            return state;
+    }
+}
+```
 
-Ensure your code is well-commented and adheres to best practices for readability and maintainability.
+### Store Implementation (store.js)
+Created a simple store with `dispatch`, `getState`, and `subscribe` methods.
+```javascript
+export function createStore(reducer) {
+    let state = reducer(undefined, {});
+    const listeners = [];
 
-## Evaluation Criteria
-- **Correctness**: Your implementation should correctly handle the scenarios as outlined in the user stories.
-- **Code Quality**: Use of functional programming principles, clear naming conventions, and code organization.
-- **Documentation**: Clarity of your approach and reflections in the README.md.
+    return {
+        // Dispatch an action to update the state
+        dispatch(action) {
+            state = reducer(state, action);
+            listeners.forEach(listener => listener());
+        },
+        // Get the current state
+        getState() {
+            return state;
+        },
+        // Subscribe a listener to state changes
+        subscribe(listener) {
+            listeners.push(listener);
+            return () => {
+                const index = listeners.indexOf(listener);
+                listeners.splice(index, 1);
+            };
+        },
+    };
+}
+```
 
-This challenge is an excellent opportunity to demonstrate your understanding of state management concepts and functional programming principles. Good luck!
+### Script to Demonstrate Usage (script.js)
+Demonstrated the store's functionality with various scenarios.
+```javascript
+import { actionTypes } from './action.js';
+import { reducer } from './reducer.js';
+import { createStore } from './store.js';
+
+// Create the store
+const store = createStore(reducer);
+
+// Subscribe to state changes and log them
+store.subscribe(() => {
+    console.log('State updated:', store.getState());
+});
+
+// Scenario 1: Initial State Verification
+console.log('Scenario 1: Initial State Verification');
+console.log(store.getState()); // Expected output: { count: 0 }
+
+// Scenario 2: Incrementing the Counter
+console.log('Scenario 2: Incrementing the Counter');
+store.dispatch({ type: actionTypes.INCREMENT });
+store.dispatch({ type: actionTypes.INCREMENT });
+console.log(store.getState()); // Expected output: { count: 2 }
+
+// Scenario 3: Decrementing the Counter
+console.log('Scenario 3: Decrementing the Counter');
+store.dispatch({ type: actionTypes.DECREMENT });
+console.log(store.getState()); // Expected output: { count: 1 }
+
+// Scenario 4: Resetting the Counter
+console.log('Scenario 4: Resetting the Counter');
+store.dispatch({ type: actionTypes.RESET });
+console.log(store.getState()); // Expected output: { count: 0 }
+```
+
+### HTML File to Include Script (index.html)
+The minimal HTML setup to run the script.
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="script.js" type="module"></script>
+</head>
+<body>
+</body>
+</html>
+```
+
+## User Stories
+- **Initial State Verification**: Confirms the initial state is `{ count: 0 }`.
+- **Incrementing the Counter**: Increments the counter twice, resulting in `{ count: 2 }`.
+- **Decrementing the Counter**: Decrements the counter, resulting in `{ count: 1 }`.
+- **Resetting the Counter**: Resets the counter, resulting in `{ count: 0 }`.
+
+## Challenges Faced
+During the implementation of this project, I encountered a few challenges:
+1. **Ensuring State Immutability**: Managing state immutably was crucial to avoid unintended side effects. This required careful design of the reducer function to always return a new state object.
+2. **Functional Programming Principles**: Sticking to functional programming principles, such as using pure functions and avoiding mutations, helped in creating a predictable state management system but required a mindset shift from imperative programming practices.
+3. **Minimalistic Implementation**: Striving for simplicity while ensuring functionality was a delicate balance. It was tempting to add more features, but the focus was on meeting the core requirements effectively.
+
+## Lessons Learned
+This project reinforced several key concepts:
+1. **Importance of Immutability**: Immutability in state management helps in maintaining predictable and traceable state changes, making debugging easier.
+2. **Functional Programming**: Applying functional programming principles, such as pure functions and immutability, leads to more maintainable and testable code.
+3. **Observer Pattern**: Implementing the observer pattern through the `subscribe` method highlighted the power of decoupling state management from UI rendering.
+4. **Simplicity and Focus**: Focusing on core functionalities without overcomplicating the implementation is crucial for clarity and maintainability.
+
+## Conclusion
+This implementation demonstrates efficient state management without UI rendering, highlighting the core principles of a Redux-inspired store. It was an insightful exercise in applying functional programming concepts to create a simple yet effective state management solution.
+```
+
+This README.md file provides a comprehensive overview of the project, how to run it, the approach taken, challenges faced, and lessons learned. It should give readers a clear understanding of the project's purpose and the thought process behind the implementation.
