@@ -14,3 +14,9 @@ store.subscribe(() => {
 // Scenario 1: Initial State Verification
 console.log('Scenario 1: Initial State Verification');
 console.log(store.getState()); // Expected output: { count: 0 }
+
+// Scenario 2: Incrementing the Counter
+console.log('Scenario 2: Incrementing the Counter');
+store.dispatch({ type: actionTypes.INCREMENT });
+store.dispatch({ type: actionTypes.INCREMENT });
+console.log(store.getState()); // Expected output: { count: 2 }
