@@ -10,3 +10,7 @@ const store = createStore(reducer);
 store.subscribe(() => {
     console.log('State updated:', store.getState());
 });
+
+// Scenario 1: Initial State Verification
+console.log('Scenario 1: Initial State Verification');
+console.log(store.getState()); // Expected output: { count: 0 }
