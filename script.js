@@ -25,3 +25,8 @@ console.log(store.getState()); // Expected output: { count: 2 }
 console.log('Scenario 3: Decrementing the Counter');
 store.dispatch({ type: actionTypes.DECREMENT });
 console.log(store.getState()); // Expected output: { count: 1 }
+
+// Scenario 4: Resetting the Counter
+console.log('Scenario 4: Resetting the Counter');
+store.dispatch({ type: actionTypes.RESET });
+console.log(store.getState()); // Expected output: { count: 0 }
